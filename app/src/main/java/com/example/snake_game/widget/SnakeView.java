@@ -19,13 +19,14 @@ import java.util.TimerTask;
 
 public class SnakeView extends View {
 
-    private int mBlocksize = 20; // Length of each cell
+    private int mBlocksize = 30; // Length of each cell
     private int mWidth, mHeight; // The range of the game area, representing the number of cells
     private int mOffsetX, mOffsetY; // Offset of the active area
     private int mSnakeLen; // Length of the snake
     private int[] mSnakeX = new int[100]; // Coordinates of the snake's body
     private int[] mSnakeY = new int[100];
     private int mSnakeDir; // Direction of the snake's movement
+    private int mSnakeOrder; //Direction of the newest order
     private int mFoodX, mFoodY; // Coordinates of the food
     private int mFoodCnt; // Number of food items eaten
 
@@ -125,7 +126,7 @@ public class SnakeView extends View {
         }
         int newheadx = 0, newheady = 0;
         //Calculate the position of the snake head
-        switch (mSnakeDir){
+        switch (mSnakeOrder){
             case 0:
                 newheadx = mSnakeX[0];
                 newheady = mSnakeY[0] - 1;
@@ -143,19 +144,60 @@ public class SnakeView extends View {
                 newheady = mSnakeY[0];
                 break;
         }
+        mSnakeDir = mSnakeOrder;
         //Determine whether the snake head exceeds the game area. If it exceeds the game area, change the game state.
         if(newheadx < 0 || newheadx >= mWidth || newheady < 0 || newheady >= mHeight){
             mGameStatus = STATUS_DEAD;
+            InitSnake();
+            invalidate();
             if(mOnSnakeDeadListener != null){
-                mOnSnakeDeadListener.OnSnakeDead(mSnakeLen);
+                mOnSnakeDeadListener.OnSnakeDead(mFoodCnt);
             }
             return;
         }
+        //Determine whether the snake head touches the body
+        for (int i = 1; i < mSnakeX.length; i++) {
+            if(mSnakeX[0]==mSnakeX[i]){
+                if(mSnakeY[0]==mSnakeY[i]){
+                    mGameStatus = STATUS_DEAD;
+                    InitSnake();
+                    invalidate();
+                    if(mOnSnakeDeadListener != null){
+                        mOnSnakeDeadListener.OnSnakeDead(mFoodCnt);
+                        return;
+                    }
+                }
+            }
+        }
+
         //Determine whether the snake has eaten food. If it eats food, it will increase its body and generate the next food immediately.
         if(newheadx == mFoodX && newheady == mFoodY){
             Random random = new Random();
-            mFoodX = random.nextInt(mWidth - 1);
-            mFoodY = random.nextInt(mHeight - 1);
+            boolean found;
+            do{
+                mFoodX = mSnakeX[0]+random.nextInt(20)-10;
+                mFoodY = mSnakeY[0]+random.nextInt(20)-10;
+                if (mFoodX < 3) {
+                    mFoodX = 3;
+                } else if (mFoodX > mWidth) {
+                    mFoodX = mWidth-3;
+                }
+                if (mFoodY < 3) {
+                    mFoodY = 3;
+                } else if (mFoodY > mHeight) {
+                    mFoodY = mHeight-3;
+                }
+                found = false;
+                for (int i = 0; i < mSnakeX.length; i++) {
+                    if(mFoodX == mSnakeX[i]){
+                        if(mFoodY == mSnakeY[i]){
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }while(found);
+
             mSnakeLen++;
             mFoodCnt++;
 
@@ -179,7 +221,6 @@ public class SnakeView extends View {
     public void StartGame(){
         switch (mGameStatus){
             case STATUS_DEAD:
-                InitSnake();
                 mGameStatus = STATUS_RUN;
                 if(mOnSnakeEatListener != null){
                     mOnSnakeEatListener.OnSnakeEatFood(mFoodCnt);
@@ -206,35 +247,23 @@ public class SnakeView extends View {
         if(mGameStatus != STATUS_RUN){
             return;
         }
-        switch (dir){
-            case DIR_UP:
-                mSnakeDir = dir;
-                break;
-            case DIR_RIGHT:
-            case DIR_DOWN:
-            case DIR_LEFT:
-                mSnakeDir = dir;
-                break;
-            default:
-                break;
+        if (dir-mSnakeDir != 2 && dir-mSnakeDir != -2){
+                mSnakeOrder = dir;
         }
     }
 
     //Snake initialization state
     public void InitSnake(){
-        mSnakeLen = 4;
-        mSnakeX[0] = 3;
-        mSnakeY[0] = 0;
-        mSnakeX[1] = 2;
-        mSnakeY[1] = 0;
-        mSnakeX[2] = 1;
-        mSnakeY[2] = 0;
-        mSnakeX[3] = 0;
-        mSnakeY[3] = 0;
-        mFoodX = 4;
-        mFoodY = 4;
+        mSnakeLen = 8;
+        for(int i=0; i < mSnakeLen ;i++) {
+            mSnakeX[i] = mBlocksize/2 - i;
+            mSnakeY[i] = mBlocksize/2;
+        }
+        mFoodX = 20;
+        mFoodY = 20;
         mFoodCnt = 0;
-        mSnakeDir = DIR_RIGHT;
+        mSnakeOrder = DIR_RIGHT;
+
     }
     //Methods when View size changes
     @Override

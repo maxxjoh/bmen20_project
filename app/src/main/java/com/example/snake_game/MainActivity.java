@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.snake_game.game.GameActivity;
+
 public class MainActivity extends AppCompatActivity {
     private Button startButton;
 

@@ -1,4 +1,4 @@
-package com.example.snake_game;
+package com.example.snake_game.game;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,8 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.snake_game.R;
 import com.example.snake_game.helper.SnakeDBOpenHelper;
 import com.example.snake_game.intface.OnSnakeDeadListener;
 import com.example.snake_game.intface.OnSnakeEatFoodListener;
@@ -92,9 +91,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.buttonRight) {
             snakeView.ControlGame(SnakeView.DIR_RIGHT);
         } else if (id == R.id.buttonRank) {
-            Intent intent = new Intent(GameActivity.this,ScoreActivity.class);
+            collectValues = false;
+            button_start.setText("Start");
+            snakeView.PauseGame();
+            Intent intent = new Intent(GameActivity.this, ScoreActivity.class);
             startActivity(intent);
         }
+
     }
 
   /*  @Override
@@ -114,14 +117,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 */
     @Override
     public void OnSnakeDead(int foodcnt) {
+        collectValues = false;
+        button_start.setText("Start");
+        //snakeView.PauseGame();
         LayoutInflater inflater = LayoutInflater.from(this);
         View textEntryView = inflater.inflate(R.layout.dialoglayout,null);
         input = (EditText) textEntryView.findViewById(R.id.editText_Name);
-        final int score = foodcnt - 4;
+        final int score = foodcnt;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Game over! Please enter your name.");
         builder.setView(textEntryView);
-        builder.setPositiveButton("Restart", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String name = input.getText().toString().trim();
@@ -155,7 +161,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             highscore = foodcnt;
         }
         textview_score.setText("Score：" + foodcnt + "    Highest Score：" + highscore);
-
     }
 }
 

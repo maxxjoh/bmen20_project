@@ -1,6 +1,5 @@
-package com.example.snake_game;
+package com.example.snake_game.game;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +7,7 @@ import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.example.snake_game.R;
 import com.example.snake_game.helper.SnakeDBOpenHelper;
 
 import java.util.ArrayList;
