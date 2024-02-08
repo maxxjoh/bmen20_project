@@ -8,16 +8,16 @@ import android.view.View.OnClickListener;
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
-    private Button startButton;
+    private Button playButton;
     private Button scoreButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startButton = findViewById(R.id.mStartButton);
+        playButton = findViewById(R.id.mPlayButton);
         scoreButton = findViewById(R.id.mScoreButton);
-        startButton.setOnClickListener(new OnClickListener() {
+        playButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent startGameActivityIntent = new Intent(MainActivity.this, GameActivity.class);
