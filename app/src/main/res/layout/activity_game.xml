@@ -61,11 +61,11 @@
         android:layout_alignParentLeft="true"
         android:text="Score：0 Highest Score：0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-    <com.example.test.widget.SnakeView
+    <com.example.snake_game.widget.SnakeView
+
         android:id="@+id/myView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/textView_Score"
         />
-
 </RelativeLayout>
