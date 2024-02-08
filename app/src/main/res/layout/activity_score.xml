@@ -12,30 +12,29 @@
         <TextView
             android:id="@+id/textView_HeadRank"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="排名"
+            android:layout_weight="1"
             android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
+            android:text="Rank"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
         <TextView
             android:id="@+id/textView_HeadName"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="玩家姓名"
+            android:layout_weight="1"
             android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
+            android:text="Player's name"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
         <TextView
             android:id="@+id/textView_HeadScore"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="得分"
+            android:layout_weight="1"
             android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
+            android:text="Score"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
     <ListView
         android:id="@+id/listView"

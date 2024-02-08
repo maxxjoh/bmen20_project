@@ -37,10 +37,6 @@
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".GameOverActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".ScoreActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"/>

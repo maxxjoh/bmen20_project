@@ -19,29 +19,30 @@ import java.util.TimerTask;
 
 public class SnakeView extends View {
 
-    private int mBlocksize = 20;//单元格的边长
-    private int mWidth,mHeight;//游戏区域的范围,代表单元格的个数
-    private int mOffsetX,mOffsetY;//活动区域的偏移量
-    private int mSnakeLen;//蛇的长度
-    private int[] mSnakeX = new int[100];//蛇的身体坐标
+    private int mBlocksize = 20; // Length of each cell
+    private int mWidth, mHeight; // The range of the game area, representing the number of cells
+    private int mOffsetX, mOffsetY; // Offset of the active area
+    private int mSnakeLen; // Length of the snake
+    private int[] mSnakeX = new int[100]; // Coordinates of the snake's body
     private int[] mSnakeY = new int[100];
-    private int mSnakeDir;//蛇的移动方向
-    private int mFoodX,mFoodY;//食物的坐标
-    private int mFoodCnt;//吃到的食物个数
+    private int mSnakeDir; // Direction of the snake's movement
+    private int mFoodX, mFoodY; // Coordinates of the food
+    private int mFoodCnt; // Number of food items eaten
+
     Paint ptBackground = new Paint();
     Paint ptHead = new Paint();
     Paint ptBody = new Paint();
     Paint ptFood = new Paint();
     Paint ptBorder = new Paint();
 
-    //蛇的游动方向
-    public static final int DIR_UP = 0;//向上
-    public static final int DIR_RIGHT = 1;//向右
-    public static final int DIR_DOWN = 2;//向下
-    public static final int DIR_LEFT = 3;//向左
+    //Snake's swimming direction
+    public static final int DIR_UP = 0;//up
+    public static final int DIR_RIGHT = 1;//right
+    public static final int DIR_DOWN = 2;//down
+    public static final int DIR_LEFT = 3;//left
 
 
-    //定时器相关设置
+    //Timer related settings
     private Timer mTimer = null;
     private TimerTask mTimerTask = null;
     private Handler mHandler = null;
@@ -63,12 +64,12 @@ public class SnakeView extends View {
         this.mOnSnakeDeadListener = mOnSnakeDeadListener;
     }
 
-    //代码创建控件时被调用
+    //The code is called when creating the control
     public SnakeView(Context context) {
         super(context);
         InitGame();
     }
-    //此构造方法在XML文件中创建控件时被调用
+    //This constructor is called when creating a control in an XML file
     public SnakeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         InitGame();
@@ -82,7 +83,7 @@ public class SnakeView extends View {
         ptFood.setColor(Color.argb(255,0,11,255));
         InitSnake();
 
-        //蛇定时器
+        //Snake timer
         mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -118,12 +119,12 @@ public class SnakeView extends View {
     }
 
     public void SnakeMove(){
-        //如果游戏不处于运动状态，不进行蛇的游动
+        //If the game is not in motion, the snake will not swim
         if(mGameStatus != STATUS_RUN){
             return;
         }
         int newheadx = 0, newheady = 0;
-        //计算蛇头的位置
+        //Calculate the position of the snake head
         switch (mSnakeDir){
             case 0:
                 newheadx = mSnakeX[0];
@@ -142,7 +143,7 @@ public class SnakeView extends View {
                 newheady = mSnakeY[0];
                 break;
         }
-        //判断蛇头是否超过游戏区域，如果超过进游戏区域更改游戏状态
+        //Determine whether the snake head exceeds the game area. If it exceeds the game area, change the game state.
         if(newheadx < 0 || newheadx >= mWidth || newheady < 0 || newheady >= mHeight){
             mGameStatus = STATUS_DEAD;
             if(mOnSnakeDeadListener != null){
@@ -150,7 +151,7 @@ public class SnakeView extends View {
             }
             return;
         }
-        //判断蛇是否吃到食物，如果吃到食物则将身体增加，并随即生成下一个食物
+        //Determine whether the snake has eaten food. If it eats food, it will increase its body and generate the next food immediately.
         if(newheadx == mFoodX && newheady == mFoodY){
             Random random = new Random();
             mFoodX = random.nextInt(mWidth - 1);
@@ -162,16 +163,16 @@ public class SnakeView extends View {
                 mOnSnakeEatListener.OnSnakeEatFood(mFoodCnt);
             }
         }
-        //挪动蛇的位置
+        //Move the snake's position
         for(int i = mSnakeLen - 1; i > 0; i--){
             mSnakeX[i] = mSnakeX[i - 1];
             mSnakeY[i] = mSnakeY[i - 1];
         }
 
-        //设定蛇头的位置
+        //Set the position of the snake head
         mSnakeX[0] = newheadx;
         mSnakeY[0] = newheady;
-        //触发onDraw进行重绘
+        //Trigger onDraw to redraw
         invalidate();
     }
 
@@ -219,7 +220,7 @@ public class SnakeView extends View {
         }
     }
 
-    //蛇的初始化状态
+    //Snake initialization state
     public void InitSnake(){
         mSnakeLen = 4;
         mSnakeX[0] = 3;
@@ -235,7 +236,7 @@ public class SnakeView extends View {
         mFoodCnt = 0;
         mSnakeDir = DIR_RIGHT;
     }
-    //View尺寸发生变化时的方法
+    //Methods when View size changes
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -246,16 +247,16 @@ public class SnakeView extends View {
         mOffsetY = (h - mHeight * mBlocksize)/2;
     }
 
-    //Paint 类 我们称之为 画笔，为画图的过程中，定义各种参数，比如：颜色、线条样式、图案样式等。
-    //Canvas 类我们定义为画布，主要提供若干方法用于绘制各种颜色图案：点、线、路径等。
-    //绘制布局内容的方法
+    //The Paint class, which we call a brush, defines various parameters for the drawing process, such as color, line style, pattern style, etc.
+    //We define the Canvas class as a canvas, which mainly provides several methods for drawing various color patterns: points, lines, paths, etc.
+    //Methods for drawing layout content
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //画游戏区域背景
+        //Paint the game area background
         canvas.drawRect(mOffsetX,mOffsetY,(mWidth) * mBlocksize + mOffsetX,
                 (mHeight) * mBlocksize + mOffsetY,ptBackground);
-        //画游戏区域边框
+        //Draw the game area border
         canvas.drawLine(mOffsetX - 1,mOffsetY - 1,mWidth * mBlocksize +mOffsetX,
                 mOffsetY - 1,ptBorder);
         canvas.drawLine(mOffsetX - 1,mOffsetY - 1,mOffsetX - 1,
@@ -264,19 +265,19 @@ public class SnakeView extends View {
                 mWidth * mBlocksize + mOffsetX,mHeight * mBlocksize + mOffsetY,ptBorder);
         canvas.drawLine(mOffsetX - 1,mHeight * mBlocksize + mOffsetY,
                 mWidth * mBlocksize + mOffsetX,mHeight * mBlocksize + mOffsetY,ptBorder);
-        //画食物
+        //Draw food
         canvas.drawRect(mFoodX * mBlocksize + mOffsetX,mFoodY * mBlocksize + mOffsetY,
                 (mFoodX + 1) * mBlocksize + mOffsetX,
                 (mFoodY + 1) * mBlocksize + mOffsetY,ptFood);
-        //画蛇
+        //Draw snake
         for(int i = 0; i < mSnakeLen; i++){
             if(i == 0){
-                //画蛇头
+                //Draw a snake head
                 canvas.drawRect(mSnakeX[i] * mBlocksize + mOffsetX,mSnakeY[i] * mBlocksize + mOffsetY,
                         (mSnakeX[i] + 1) * mBlocksize + mOffsetX,
                         (mSnakeY[i] + 1) * mBlocksize + mOffsetY,ptHead);
             }else{
-                //画蛇身
+                //Draw a snake body
                 canvas.drawRect(mSnakeX[i] * mBlocksize + mOffsetX,mSnakeY[i] * mBlocksize + mOffsetY,
                         (mSnakeX[i] + 1) * mBlocksize + mOffsetX,
                         (mSnakeY[i] + 1) * mBlocksize + mOffsetY,ptBody);

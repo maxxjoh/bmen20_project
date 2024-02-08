@@ -36,20 +36,20 @@
         android:text="↑"/>
 
     <Button
-        android:id="@+id/buttonPause"
+        android:id="@+id/buttonRank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/buttonLeft"
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@id/buttonLeft"
-        android:text="Pause" />
+        android:text="Rank" />
 
     <Button
         android:id="@+id/buttonStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/buttonPause"
-        android:layout_alignRight="@id/buttonPause"
+        android:layout_alignLeft="@id/buttonRank"
+        android:layout_alignRight="@id/buttonRank"
         android:layout_alignBottom="@id/buttonUp"
         android:text="Start" />
 
