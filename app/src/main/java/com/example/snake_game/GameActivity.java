@@ -6,12 +6,19 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+
+import java.io.File;
+import java.io.IOException;
+import java.io.FileWriter;
+
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -25,6 +32,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     boolean first_read;
     double init_time, new_time, prev_time; // Used to keep track of time when calculating derivative
     float[] new_vals, prev_vals; // Float arrays used for calculating derivative
+
+    private static final String DataFile = "AccData.txt"; //Name of the file to which the data is exported
 
     float initX, initY, initZ;
 
@@ -70,6 +79,28 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         prev_vals = new float[3]; new_vals = new float[3];
     }
 
+
+   public static void save(String FILE_NAME, float[] Data) {
+       String state = Environment.getExternalStorageState();
+       if (!Environment.MEDIA_MOUNTED.equals(state)) {
+           return;
+       }
+       File file = new File(Environment.getExternalStoragePublicDirectory(
+               Environment.DIRECTORY_DOWNLOADS), FILE_NAME);
+       for (int i = 0; i < Data.length; i++) {
+           // Convert float to String
+           String stringValue = Float.toString(Data[i]);
+           // Write String to txt file
+           try {
+               FileWriter writer = new FileWriter(file, true);
+               writer.write(stringValue);
+               writer.write(System.lineSeparator());
+               writer.close();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       }
+   }
     public float[] sensorDerivative(float[] sens_vals) {
         if(first_read) { // True if its the first read of the sensor values
             init_time = System.nanoTime() / 10e8; // Read initial time value
@@ -115,7 +146,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             sensor_values[0] = event.values[0];
             sensor_values[1] = event.values[1];
             sensor_values[2] = event.values[2];
-
+            save(DataFile, sensor_values);
             xVal.setText(String.valueOf(sensor_values[0]));
             yVal.setText(String.valueOf(sensor_values[1]));
             zVal.setText(String.valueOf(sensor_values[2]));
@@ -173,4 +204,5 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
     }
+
 }
