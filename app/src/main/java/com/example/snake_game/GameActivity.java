@@ -70,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this,
                 accelerometer,
-                SensorManager.SENSOR_DELAY_GAME);
+                SensorManager.SENSOR_DELAY_FASTEST);
 
         gravity = new float[3];
         init_value_check = true;
@@ -126,8 +126,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Calculate difference in values and store them
         float[] delta_vals = new float[3];
         delta_vals[0] = new_vals[0]-prev_vals[0];
-        delta_vals[1] = new_vals[0]-prev_vals[1];
-        delta_vals[2] = new_vals[0]-prev_vals[2];
+        delta_vals[1] = new_vals[1]-prev_vals[1];
+        delta_vals[2] = new_vals[2]-prev_vals[2];
         // Calculate time difference between values
         double delta_time = new_time - prev_time;
 
@@ -152,8 +152,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             zVal.setText(String.valueOf(sensor_values[2]));
 
             float[] sens_derivatives = sensorDerivative(sensor_values);
-            if(sens_derivatives[0] >= 100) {
+            if(sens_derivatives[0] > 100 && sensor_values[0] > 5) {
                 direction.setText("LEFT");
+            }else if(sens_derivatives[0] < -100 && sensor_values[0] < -5){
+                direction.setText("RIGHT");
+            }else if(sens_derivatives[1] > 100 && sensor_values[1] > 6){
+                direction.setText("UP");
+            }else if(sens_derivatives[1] < -100 && sensor_values[1] < -1){
+                direction.setText("DOWN");
             }
         }
 
