@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.widget.Button;
@@ -22,6 +23,10 @@ import com.example.snake_game.helper.SnakeDBOpenHelper;
 import com.example.snake_game.intface.OnSnakeDeadListener;
 import com.example.snake_game.intface.OnSnakeEatFoodListener;
 import com.example.snake_game.widget.SnakeView;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.FileWriter;
 
 //imports for sensor
 import android.content.Context;
@@ -60,7 +65,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     float[] gravity;
     boolean initValueCheck;
     float initX, initY, initZ;
+    boolean first_read;
+    double init_time, new_time, prev_time; // Used to keep track of time when calculating derivative
+    float[] new_vals, prev_vals; // Float arrays used for calculating derivative
 
+    private static final String DataFile = "AccData_Game.txt"; //Name of the file to which the data is exported
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,10 +100,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this,
                 accelerometer,
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
 
         gravity = new float[3];
         initValueCheck = true;
+        first_read = true;
+        init_time = 0; new_time = 0; prev_time = 0;
+        prev_vals = new float[3]; new_vals = new float[3];
 
         //Highest score
         openHelper = new SnakeDBOpenHelper(this,"table_score",null,1);
@@ -108,6 +120,66 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+    }
+
+    public static void save(String FILE_NAME, float[] Data) {
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            return;
+        }
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS), FILE_NAME);
+        for (int i = 0; i < Data.length; i++) {
+            // Convert float to String
+            String stringValue = Float.toString(Data[i]);
+            // Write String to txt file
+            try {
+                FileWriter writer = new FileWriter(file, true);
+                writer.write(stringValue);
+                writer.write(System.lineSeparator());
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public float[] sensorDerivative(float[] sens_vals) {
+        if(first_read) { // True if its the first read of the sensor values
+            init_time = System.nanoTime() / 10e8; // Read initial time value
+            new_time = init_time; // new_time becomes init_time
+            new_vals[0] = sens_vals[0];
+            new_vals[1] = sens_vals[1];
+            new_vals[2] = sens_vals[2];
+            first_read = false;
+        }
+        else {
+            prev_time = new_time; // new_time becomes previous time value
+            new_time = System.nanoTime() / 10e8; // Update new_time
+            // new_vals becomes previous sensor values
+            prev_vals[0] = new_vals[0];
+            prev_vals[1] = new_vals[1];
+            prev_vals[2] = new_vals[2];
+            // Set up for new iteration
+            new_vals[0] = sens_vals[0];
+            new_vals[1] = sens_vals[1];
+            new_vals[2] = sens_vals[2];
+        }
+
+        // Calculate difference in values and store them
+        float[] delta_vals = new float[3];
+        delta_vals[0] = new_vals[0]-prev_vals[0];
+        delta_vals[1] = new_vals[1]-prev_vals[1];
+        delta_vals[2] = new_vals[2]-prev_vals[2];
+        // Calculate time difference between values
+        double delta_time = new_time - prev_time;
+
+        float[] sensval_derivative = new float[3];
+        sensval_derivative[0] = (float) (delta_vals[0]/delta_time);
+        sensval_derivative[1] = (float) (delta_vals[1]/delta_time);
+        sensval_derivative[2] = (float) (delta_vals[2]/delta_time);
+
+        return sensval_derivative;
     }
 
     @Override
@@ -213,31 +285,40 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(collectValues) {
-            if(initValueCheck) {
-                initX = event.values[0];
-                initY = event.values[1];
-                initZ = event.values[2];
 
+            if(initValueCheck) {
+               /* initX = event.values[0];
+                initY = event.values[1];
+                initZ = event.values[2];*/
+                initX = 0;
+                initY = 0;
+                initZ = 9.8f;
                 initValueCheck = false;
             }
 
-            float x, y, z;
-            x = event.values[0];
-            y = event.values[1];
-            z = event.values[2];
+            float[] sensor_values = new float[4];
+            sensor_values[0] = event.values[0];
+            sensor_values[1] = event.values[1];
+            sensor_values[2] = event.values[2];
 
-            if((x-initX) >= 4) {
+
+            float[] sens_derivatives = sensorDerivative(sensor_values);
+            if(sens_derivatives[0] > 100 && sensor_values[0]-initX > 2) {
                 snakeView.ControlGame(SnakeView.DIR_LEFT);
-            }
-            else if ((x-initX) <= (-4)) {
+                sensor_values[3] =1;
+            }else if(sens_derivatives[0] < -100 && sensor_values[0]-initX < -2){
                 snakeView.ControlGame(SnakeView.DIR_RIGHT);
-            }
-            else if((y-initY) >= 3) {
+                sensor_values[3] =-1;
+            }else if(sens_derivatives[1] > 100 && sensor_values[1]-initY > 2){
                 snakeView.ControlGame(SnakeView.DIR_DOWN);
-            }
-            else if((y-initY) <= (-3)) {
+                sensor_values[3] =2;
+            }else if(sens_derivatives[1] < -100 && sensor_values[1]-initY < -2){
                 snakeView.ControlGame(SnakeView.DIR_UP);
-            }
+                sensor_values[3] =-2;
+            }/*else {
+                sensor_values[3] =0;
+            }*/
+            save(DataFile, sensor_values);
         }
     }
 
@@ -253,7 +334,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
     }
 
 
