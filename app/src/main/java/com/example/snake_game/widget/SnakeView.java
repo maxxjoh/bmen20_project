@@ -243,13 +243,15 @@ public class SnakeView extends View {
         }
     }
 
-    public void ControlGame(int dir){
+    public int ControlGame(int dir){
         if(mGameStatus != STATUS_RUN){
-            return;
+            return -1;
         }
         if (dir-mSnakeDir != 2 && dir-mSnakeDir != -2){
                 mSnakeOrder = dir;
+                return 1;
         }
+        return 0;
     }
 
     //Snake initialization state

@@ -42,11 +42,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     //variables for the game
     Button button_start;
     Button button_pause;
-    Button button_up;
+    /* Button button_up;
     Button button_down;
     Button button_left;
-    Button button_right;
+    Button button_right; */
     TextView textview_score;
+    TextView textview_direction;
     SnakeView snakeView;
     private int highscore = 0;
     boolean collectValues = false;
@@ -82,6 +83,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         button_right.setOnClickListener(this);
         */
         textview_score = (TextView)this.findViewById(R.id.textView_Score);
+        textview_direction = (TextView)this.findViewById(R.id.direction);
         snakeView = (SnakeView)this.findViewById(R.id.myView);
         snakeView.setmOnSnakeDeadListener(this);
         snakeView.setmOnSnakeEatListener(this);
@@ -91,7 +93,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this,
                 accelerometer,
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
 
         gravity = new float[3];
         initValueCheck = true;
@@ -105,8 +107,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             highscore = cursor.getInt(2);
         }
         textview_score.setText("Score：0"+ "    Highest Score：" + highscore);
-
-
 
     }
 
@@ -167,6 +167,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void OnSnakeDead(int foodcnt) {
         collectValues = false;
         button_start.setText("Start");
+        textview_direction.setText("DIRECTION");
         //snakeView.PauseGame();
         LayoutInflater inflater = LayoutInflater.from(this);
         View textEntryView = inflater.inflate(R.layout.dialoglayout,null);
@@ -227,16 +228,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             z = event.values[2];
 
             if((x-initX) >= 4) {
-                snakeView.ControlGame(SnakeView.DIR_LEFT);
+                int a = snakeView.ControlGame(SnakeView.DIR_LEFT);
+                if(a > 0) {
+                    textview_direction.setText("LEFT");
+                }
             }
             else if ((x-initX) <= (-4)) {
-                snakeView.ControlGame(SnakeView.DIR_RIGHT);
+                int a = snakeView.ControlGame(SnakeView.DIR_RIGHT);
+                if(a > 0) {
+                    textview_direction.setText("RIGHT");
+                }
             }
             else if((y-initY) >= 3) {
-                snakeView.ControlGame(SnakeView.DIR_DOWN);
+                int a = snakeView.ControlGame(SnakeView.DIR_DOWN);
+                if(a > 0) {
+                    textview_direction.setText("DOWN");
+                }
             }
             else if((y-initY) <= (-3)) {
-                snakeView.ControlGame(SnakeView.DIR_UP);
+                int a = snakeView.ControlGame(SnakeView.DIR_UP);
+                if(a > 0) {
+                    textview_direction.setText("UP");
+                }
             }
         }
     }
@@ -253,7 +266,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
     }
 
 

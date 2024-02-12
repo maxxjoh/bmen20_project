@@ -8,19 +8,18 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.snake_game.game.GameActivity;
-import com.example.snake_game.TestActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private Button startButton;
-    private Button testButton;
+    private Button playButton;
+    private Button scoreButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        startButton = findViewById(R.id.mStartButton);
-        testButton = findViewById(R.id.mTestButton);
-        startButton.setOnClickListener(new View.OnClickListener() {
+        playButton = findViewById(R.id.mPlayButton);
+        scoreButton = findViewById(R.id.mScoreButton);
+        playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent startStartGameIntent = new Intent(MainActivity.this,
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(startStartGameIntent);
             }
         });
-        testButton.setOnClickListener(new View.OnClickListener() {
+        scoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent startTestActivityIntent = new Intent(MainActivity.this, TestActivity.class);

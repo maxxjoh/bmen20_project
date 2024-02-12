@@ -4,45 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.test.game.MainActivity">
-
-    <Button
-        android:id="@+id/buttonRight"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="→"/>
-    <Button
-        android:id="@+id/buttonDown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/buttonRight"
-        android:layout_toLeftOf="@id/buttonRight"
-        android:text="↓"/>
-    <Button
-        android:id="@+id/buttonLeft"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/buttonDown"
-        android:layout_toLeftOf="@id/buttonDown"
-        android:text="←"/>
-    <Button
-        android:id="@+id/buttonUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/buttonDown"
-        android:layout_toRightOf="@id/buttonLeft"
-        android:text="↑"/>
+    tools:context="com.example.snake_game.game.GameActivity">
 
     <Button
         android:id="@+id/buttonRank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/buttonLeft"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@id/buttonLeft"
-        android:text="Rank" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="5dp"
+        android:text="Scores" />
 
     <Button
         android:id="@+id/buttonStart"
@@ -50,15 +22,29 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/buttonRank"
         android:layout_alignRight="@id/buttonRank"
-        android:layout_alignBottom="@id/buttonUp"
+        android:layout_above="@id/buttonRank"
         android:text="Start" />
+
+    <TextView
+        android:id="@+id/direction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/buttonRank"
+        android:layout_alignBottom="@id/buttonRank"
+        android:layout_alignTop="@id/buttonStart"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        android:text="DIRECTION"
+        android:textSize="32sp"
+        android:textColor="@color/black"/>
+
 
     <TextView
         android:id="@+id/textView_Score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/buttonStart"
-        android:layout_alignParentLeft="true"
+        android:layout_alignLeft="@id/buttonRank"
         android:text="Score：0 Highest Score：0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     <com.example.snake_game.widget.SnakeView
