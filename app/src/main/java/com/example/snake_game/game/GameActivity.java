@@ -69,7 +69,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     double init_time, new_time, prev_time; // Used to keep track of time when calculating derivative
     float[] new_vals, prev_vals; // Float arrays used for calculating derivative
 
-    private static final String DataFile = "AccData_Game.txt"; //Name of the file to which the data is exported
+    private static final String DataFile = "AccData_Game.txt";
+    private static final String DataFile_2 = "De_AccData_Game.txt";
+    //Name of the file to which the data is exported
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -287,7 +290,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if(collectValues) {
 
             if(initValueCheck) {
-               /* initX = event.values[0];
+                /*initX = event.values[0];
                 initY = event.values[1];
                 initZ = event.values[2];*/
                 initX = 0;
@@ -300,7 +303,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             sensor_values[0] = event.values[0];
             sensor_values[1] = event.values[1];
             sensor_values[2] = event.values[2];
-
 
             float[] sens_derivatives = sensorDerivative(sensor_values);
             if(sens_derivatives[0] > 100 && sensor_values[0]-initX > 2) {
@@ -319,6 +321,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 sensor_values[3] =0;
             }*/
             save(DataFile, sensor_values);
+            save(DataFile_2, sens_derivatives);
         }
     }
 
