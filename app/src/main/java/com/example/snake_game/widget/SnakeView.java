@@ -177,15 +177,15 @@ public class SnakeView extends View {
             do{
                 mFoodX = mSnakeX[0]+random.nextInt(20)-10;
                 mFoodY = mSnakeY[0]+random.nextInt(20)-10;
-                if (mFoodX < 3) {
-                    mFoodX = 3;
+                if (mFoodX < 5) {
+                    mFoodX = 5;
                 } else if (mFoodX > mWidth) {
-                    mFoodX = mWidth-3;
+                    mFoodX = mWidth-5;
                 }
-                if (mFoodY < 3) {
-                    mFoodY = 3;
+                if (mFoodY < 5) {
+                    mFoodY = 5;
                 } else if (mFoodY > mHeight) {
-                    mFoodY = mHeight-3;
+                    mFoodY = mHeight-5;
                 }
                 found = false;
                 for (int i = 0; i < mSnakeX.length; i++) {

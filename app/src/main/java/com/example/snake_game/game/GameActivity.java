@@ -7,11 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -47,10 +49,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     //variables for the game
     Button button_start;
     Button button_pause;
-    Button button_up;
-    Button button_down;
-    Button button_left;
-    Button button_right;
+    private ProgressBar progress_horizontal;
+    private ProgressBar progress_vertical;
     TextView textview_score;
     SnakeView snakeView;
     private int highscore = 0;
@@ -71,6 +71,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String DataFile = "AccData_Game.txt";
     private static final String DataFile_2 = "De_AccData_Game.txt";
+    private static final String DataFile_3 = "linear_AccData_Game.txt";
     //Name of the file to which the data is exported
 
     @Override
@@ -83,6 +84,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         button_start.setOnClickListener(this);
         button_pause = (Button)this.findViewById(R.id.buttonRank);
         button_pause.setOnClickListener(this);
+        progress_horizontal = (ProgressBar)this.findViewById(R.id.progressBar_horizontal);
+        progress_vertical = (ProgressBar)this.findViewById(R.id.progressBar_vertical);
         /*
         button_up = (Button)this.findViewById(R.id.buttonUp);
         button_up.setOnClickListener(this);
@@ -184,15 +187,30 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         return sensval_derivative;
     }
+    private void startCountdown() {
+        // Create a 3 second countdown
+        new CountDownTimer(3000, 1) {
+            public void onTick(long millisUntilFinished) {
+                // Update the UI at each tick
+                button_start.setText(String.valueOf(millisUntilFinished / 1000+1));
+            }
 
+            public void onFinish() {
+                button_start.setText("Pause"); // restore button text
+                // Countdown to end task execution
+                snakeView.StartGame();
+                button_start.setEnabled(true);
+            }
+        }.start();
+    }
     @Override
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.buttonStart) {
             if(!collectValues) {
                 collectValues = true;
-                button_start.setText("Pause");
-               snakeView.StartGame();
+                button_start.setEnabled(false);
+                startCountdown();
             } else{
                 collectValues = false;
                 initValueCheck = true;
@@ -287,41 +305,61 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(collectValues) {
 
+        if(collectValues) {
+/*
             if(initValueCheck) {
-                /*initX = event.values[0];
+                initX = event.values[0];
                 initY = event.values[1];
-                initZ = event.values[2];*/
-                initX = 0;
-                initY = 0;
-                initZ = 9.8f;
+                initZ = event.values[2];
                 initValueCheck = false;
             }
-
+*/
             float[] sensor_values = new float[4];
             sensor_values[0] = event.values[0];
             sensor_values[1] = event.values[1];
             sensor_values[2] = event.values[2];
 
+            float[] linear_sensor_values = new float[3];
+            float alpha = 0.9f;
+            gravity[0] = alpha * gravity[0] + (1- alpha) * sensor_values[0];
+            gravity[1] = alpha * gravity[1] + (1- alpha) * sensor_values[1];
+            gravity[2] = alpha * gravity[2] + (1- alpha) * sensor_values[2];
+
+            linear_sensor_values[0] = sensor_values[0]- gravity[0];
+            linear_sensor_values[1] = sensor_values[1]- gravity[1];
+            linear_sensor_values[2] = sensor_values[2]- gravity[2];
+
+
+            int progressStatus_horizontal;
+            int progressStatus_vertical;
+            progressStatus_horizontal = (int) (100-100/6*(linear_sensor_values[0]+3));
+            progressStatus_vertical = (int) (100-100/6*(linear_sensor_values[1]+3));
+            progress_horizontal.setProgress(progressStatus_horizontal);
+            progress_vertical.setProgress(progressStatus_vertical);
+
+           /* initX = 0;
+            initY = 0;
+            initZ = 9.8f;*/
             float[] sens_derivatives = sensorDerivative(sensor_values);
-            if(sens_derivatives[0] > 100 && sensor_values[0]-initX > 2) {
+            if(sens_derivatives[0] > 100 && linear_sensor_values[0] > 3) {
                 snakeView.ControlGame(SnakeView.DIR_LEFT);
                 sensor_values[3] =1;
-            }else if(sens_derivatives[0] < -100 && sensor_values[0]-initX < -2){
+            }else if(sens_derivatives[0] < -100 && linear_sensor_values[0] < -3){
                 snakeView.ControlGame(SnakeView.DIR_RIGHT);
                 sensor_values[3] =-1;
-            }else if(sens_derivatives[1] > 100 && sensor_values[1]-initY > 2){
+            }else if(sens_derivatives[1] > 50 && linear_sensor_values[1] > 3){
                 snakeView.ControlGame(SnakeView.DIR_DOWN);
                 sensor_values[3] =2;
-            }else if(sens_derivatives[1] < -100 && sensor_values[1]-initY < -2){
+            }else if(sens_derivatives[1] < -50 && linear_sensor_values[1] < -3){
                 snakeView.ControlGame(SnakeView.DIR_UP);
                 sensor_values[3] =-2;
             }/*else {
                 sensor_values[3] =0;
             }*/
-            save(DataFile, sensor_values);
+            /*save(DataFile, sensor_values);
             save(DataFile_2, sens_derivatives);
+            save(DataFile_3, linear_sensor_values);*/
         }
     }
 
