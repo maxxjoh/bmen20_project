@@ -348,7 +348,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }else if(sens_derivatives[0] < -100 && linear_sensor_values[0] < -3){
                 snakeView.ControlGame(SnakeView.DIR_RIGHT);
                 sensor_values[3] =-1;
-            }else if(sens_derivatives[1] > 50 && linear_sensor_values[1] > 3){
+            }else if(sens_derivatives[1] > 50 && linear_sensor_values[1] > 2){
                 snakeView.ControlGame(SnakeView.DIR_DOWN);
                 sensor_values[3] =2;
             }else if(sens_derivatives[1] < -50 && linear_sensor_values[1] < -3){
@@ -357,7 +357,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }/*else {
                 sensor_values[3] =0;
             }*/
-            /*save(DataFile, sensor_values);
+            save(DataFile, sensor_values);
+            /*
             save(DataFile_2, sens_derivatives);
             save(DataFile_3, linear_sensor_values);*/
         }
