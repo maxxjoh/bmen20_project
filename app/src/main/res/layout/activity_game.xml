@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.snake_game.game.GameActivity">
+
+    <Button
+        android:id="@+id/buttonRank"
+        android:layout_width="115dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="7dp"
+        android:layout_marginBottom="7dp"
+
+        android:text="Rank" />
+
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttonRank"
+        android:layout_alignLeft="@id/buttonRank"
+        android:layout_alignRight="@id/buttonRank"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="-3dp"
+        android:text="Start" />
+
+    <TextView
+        android:id="@+id/textView_Score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttonStart"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="0dp"
+        android:text="Score：0 Highest Score：0"
+        android:textSize="15sp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <com.example.snake_game.widget.SnakeView
+
+        android:id="@+id/myView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/textView_Score"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBar_horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="124dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="40dp"
+        android:indeterminateBehavior="repeat"
+        android:max='100'
+        android:mirrorForRtl="false"
+        android:progress='50' />
+
+    <ProgressBar
+        android:id="@+id/progressBar_vertical"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="124dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="40dp"
+        android:indeterminateBehavior="repeat"
+        android:max='100'
+        android:mirrorForRtl="false"
+        android:progress='50'
+        android:rotation="270" />
+
+</RelativeLayout>
