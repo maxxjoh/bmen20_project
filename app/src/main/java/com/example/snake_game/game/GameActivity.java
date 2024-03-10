@@ -61,10 +61,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     //variables for the sensor
     SensorManager sensorManager;
     Sensor accelerometer;
-    int counter; // X-axis
     float[] gravity;
-    boolean initValueCheck;
-    float initX, initY, initZ;
     boolean first_read;
     double init_time, new_time, prev_time; // Used to keep track of time when calculating derivative
     float[] new_vals, prev_vals; // Float arrays used for calculating derivative
@@ -86,16 +83,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         button_pause.setOnClickListener(this);
         progress_horizontal = (ProgressBar)this.findViewById(R.id.progressBar_horizontal);
         progress_vertical = (ProgressBar)this.findViewById(R.id.progressBar_vertical);
-        /*
-        button_up = (Button)this.findViewById(R.id.buttonUp);
-        button_up.setOnClickListener(this);
-        button_down = (Button)this.findViewById(R.id.buttonDown);
-        button_down.setOnClickListener(this);
-        button_left = (Button)this.findViewById(R.id.buttonLeft);
-        button_left.setOnClickListener(this);
-        button_right = (Button)this.findViewById(R.id.buttonRight);
-        button_right.setOnClickListener(this);
-        */
+
         textview_score = (TextView)this.findViewById(R.id.textView_Score);
         snakeView = (SnakeView)this.findViewById(R.id.myView);
         snakeView.setmOnSnakeDeadListener(this);
@@ -109,7 +97,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 SensorManager.SENSOR_DELAY_GAME);
 
         gravity = new float[3];
-        initValueCheck = true;
         first_read = true;
         init_time = 0; new_time = 0; prev_time = 0;
         prev_vals = new float[3]; new_vals = new float[3];
@@ -187,6 +174,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         return sensval_derivative;
     }
+    public float[] linearAcc(float[] sens_vals, float alpha) {
+        float[] linear_acc = new float[3];
+
+        gravity[0] = alpha * gravity[0] + (1- alpha) * sens_vals[0];
+        gravity[1] = alpha * gravity[1] + (1- alpha) * sens_vals[1];
+        gravity[2] = alpha * gravity[2] + (1- alpha) * sens_vals[2];
+
+        linear_acc[0] = sens_vals[0]- gravity[0];
+        linear_acc[1] = sens_vals[1]- gravity[1];
+        linear_acc[2] = sens_vals[2]- gravity[2];
+
+        return linear_acc;
+    }
     private void startCountdown() {
         // Create a 3 second countdown
         new CountDownTimer(3000, 1) {
@@ -213,25 +213,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 startCountdown();
             } else{
                 collectValues = false;
-                initValueCheck = true;
-                initX = 0;
-                initY = 0;
-                initZ = 0;
 
                 button_start.setText("Start");
                 snakeView.PauseGame();
             }
-        /*
-        } else if (id == R.id.buttonUp) {
-            snakeView.ControlGame(SnakeView.DIR_UP);
-        } else if (id == R.id.buttonDown) {
-            snakeView.ControlGame(SnakeView.DIR_DOWN);
-        } else if (id == R.id.buttonLeft) {
-            snakeView.ControlGame(SnakeView.DIR_LEFT);
-        } else if (id == R.id.buttonRight) {
-            snakeView.ControlGame(SnakeView.DIR_RIGHT);
-        */
-        } else if (id == R.id.buttonRank) {
+        }
+        else if (id == R.id.buttonRank) {
             collectValues = false;
             button_start.setText("Start");
             snakeView.PauseGame();
@@ -241,21 +228,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-  /*  @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.view_rank){
-            Intent intent = new Intent(GameActivity.this,ScoreActivity.class);
-            startActivity(intent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-*/
     @Override
     public void OnSnakeDead(int foodcnt) {
         collectValues = false;
@@ -307,29 +279,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void onSensorChanged(SensorEvent event) {
 
         if(collectValues) {
-/*
-            if(initValueCheck) {
-                initX = event.values[0];
-                initY = event.values[1];
-                initZ = event.values[2];
-                initValueCheck = false;
-            }
-*/
-            float[] sensor_values = new float[4];
+            float[] sensor_values = new float[3];
             sensor_values[0] = event.values[0];
             sensor_values[1] = event.values[1];
             sensor_values[2] = event.values[2];
 
-            float[] linear_sensor_values = new float[3];
-            float alpha = 0.9f;
-            gravity[0] = alpha * gravity[0] + (1- alpha) * sensor_values[0];
-            gravity[1] = alpha * gravity[1] + (1- alpha) * sensor_values[1];
-            gravity[2] = alpha * gravity[2] + (1- alpha) * sensor_values[2];
-
-            linear_sensor_values[0] = sensor_values[0]- gravity[0];
-            linear_sensor_values[1] = sensor_values[1]- gravity[1];
-            linear_sensor_values[2] = sensor_values[2]- gravity[2];
-
+            float[] linear_sensor_values = linearAcc(sensor_values,0.9f);
 
             int progressStatus_horizontal;
             int progressStatus_vertical;
@@ -338,29 +293,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             progress_horizontal.setProgress(progressStatus_horizontal);
             progress_vertical.setProgress(progressStatus_vertical);
 
-           /* initX = 0;
-            initY = 0;
-            initZ = 9.8f;*/
             float[] sens_derivatives = sensorDerivative(sensor_values);
-            if(sens_derivatives[0] > 100 && linear_sensor_values[0] > 3) {
+            if (sens_derivatives[0] > 100 && linear_sensor_values[0] > 3) {
                 snakeView.ControlGame(SnakeView.DIR_LEFT);
-                sensor_values[3] =1;
-            }else if(sens_derivatives[0] < -100 && linear_sensor_values[0] < -3){
+            }
+            else if (sens_derivatives[0] < -100 && linear_sensor_values[0] < -3){
                 snakeView.ControlGame(SnakeView.DIR_RIGHT);
-                sensor_values[3] =-1;
-            }else if(sens_derivatives[1] > 50 && linear_sensor_values[1] > 2){
+            }
+            else if (sens_derivatives[1] > 50 && linear_sensor_values[1] > 2){
                 snakeView.ControlGame(SnakeView.DIR_DOWN);
-                sensor_values[3] =2;
-            }else if(sens_derivatives[1] < -50 && linear_sensor_values[1] < -3){
+            }
+            else if (sens_derivatives[1] < -50 && linear_sensor_values[1] < -3){
                 snakeView.ControlGame(SnakeView.DIR_UP);
-                sensor_values[3] =-2;
-            }/*else {
-                sensor_values[3] =0;
-            }*/
-            save(DataFile, sensor_values);
-            /*
-            save(DataFile_2, sens_derivatives);
-            save(DataFile_3, linear_sensor_values);*/
+            }
+
+            //save(DataFile, sensor_values);
+            //save(DataFile_2, sens_derivatives);
+            //save(DataFile_3, linear_sensor_values);
         }
     }
 
@@ -381,23 +330,3 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
 }
-
-
-  /* SensorManager sensorManager;
-  Sensor accelerometer;
-
-  protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-}*/
